@@ -5,6 +5,7 @@
 #ifndef NOTEPAD_H
 #define NOTEPAD_H
 
+#include <QApplication>
 #include <QMainWindow>
 #include <QMenuBar>
 #include <QTextEdit>
@@ -12,6 +13,9 @@
 #include <QFileDialog>
 #include <QFile>
 #include <QMessageBox>
+#include <QClipboard>
+#include <QMimeData>
+#include <QDateTime>
 
 class notepad : public QMainWindow
 {
@@ -24,6 +28,13 @@ private slots:
     void openDocument();
     void saveDocument();
     void saveDocumentAs();
+    void undo();
+    void redo();
+    void cut();
+    void copy();
+    void paste();
+    void deleteSelection();
+    void timeAndDate();
 private:
     void createMenuBar();
     void setCurrentFile(QString file);

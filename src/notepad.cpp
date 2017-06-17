@@ -22,18 +22,37 @@ void notepad::createMenuBar()
     menuBar = new QMenuBar();
 
     QMenu *fileMenu = menuBar->addMenu("File");
-    QAction *newDoc = fileMenu->addAction("New");
-    QAction *openDoc = fileMenu->addAction("Open");
-    QAction *saveDoc = fileMenu->addAction("Save");
-    QAction *saveDocAs = fileMenu->addAction("Save As");
+    QAction *newAction = fileMenu->addAction("New");
+    QAction *openAction = fileMenu->addAction("Open");
+    QAction *saveAction = fileMenu->addAction("Save");
+    QAction *saveAsAction = fileMenu->addAction("Save As");
     fileMenu->addSeparator();
-    QAction *exit = fileMenu->addAction("Exit");
+    QAction *exitAction = fileMenu->addAction("Exit");
 
-    connect(newDoc, &QAction::triggered, this, &notepad::newDocument);
-    connect(openDoc, &QAction::triggered, this, &notepad::openDocument);
-    connect(saveDoc, &QAction::triggered, this, &notepad::saveDocument);
-    connect(saveDocAs, &QAction::triggered, this, &notepad::saveDocumentAs);
-    connect(exit, &QAction::triggered, this, &QCoreApplication::exit);
+    connect(newAction, &QAction::triggered, this, &notepad::newDocument);
+    connect(openAction, &QAction::triggered, this, &notepad::openDocument);
+    connect(saveAction, &QAction::triggered, this, &notepad::saveDocument);
+    connect(saveAsAction, &QAction::triggered, this, &notepad::saveDocumentAs);
+    connect(exitAction, &QAction::triggered, this, &QCoreApplication::exit);
+
+    QMenu *editMenu = menuBar->addMenu("Edit");
+    QAction *undoAction = editMenu->addAction("Undo");
+    QAction *redoAction = editMenu->addAction("Redo");
+    editMenu->addSeparator();
+    QAction *cutAction = editMenu->addAction("Cut");
+    QAction *copyAction = editMenu->addAction("Copy");
+    QAction *pasteAction = editMenu->addAction("Paste");
+    QAction *deleteAction = editMenu->addAction("Delete");
+    editMenu->addSeparator();
+    QAction *timeAction = editMenu->addAction("Time and Date");
+
+    connect(undoAction, &QAction::triggered, this, &notepad::undo);
+    connect(redoAction, &QAction::triggered, this, &notepad::redo);
+    connect(cutAction, &QAction::triggered, this, &notepad::cut);
+    connect(copyAction, &QAction::triggered, this, &notepad::copy);
+    connect(pasteAction, &QAction::triggered, this, &notepad::paste);
+    connect(deleteAction, &QAction::triggered, this, &notepad::deleteSelection);
+    connect(timeAction, &QAction::triggered, this, &notepad::timeAndDate);
 
     setMenuBar(menuBar);
 }
@@ -81,6 +100,7 @@ void notepad::openDocument()
         }
 
         setCurrentFile(fileName);
+        file.close();
     }
 }
 
@@ -105,6 +125,7 @@ void notepad::saveDocumentAs()
 
         setCurrentFile(fileName);
         save();
+        file.close();
     }
 }
 
@@ -121,5 +142,44 @@ void notepad::save()
     QTextStream out(&file);
     out << documentArea->toPlainText();
 
+    file.close();
+}
 
+void  notepad::undo()
+{
+    documentArea->undo();
+}
+
+void notepad::redo()
+{
+    documentArea->redo();
+}
+
+void notepad::cut()
+{
+    documentArea->cut();
+}
+
+void notepad::copy()
+{
+    documentArea->copy();
+}
+
+void notepad::paste()
+{
+    const QClipboard *clipboard = QGuiApplication::clipboard();
+    const QMimeData *mimeData = clipboard->mimeData();
+    documentArea->insertPlainText(mimeData->text());
+}
+
+void notepad::deleteSelection()
+{
+    documentArea->textCursor().removeSelectedText();
+}
+
+void notepad::timeAndDate()
+{
+    QDateTime time = QDateTime::currentDateTime();
+
+    documentArea->append(time.toString("h:mm AP M/d/yy"));
 }
