@@ -65,6 +65,13 @@ void notepad::createMenuBar()
     connect(deleteAction, &QAction::triggered, this, &notepad::deleteSelection);
     connect(timeAction, &QAction::triggered, this, &notepad::timeAndDate);
 
+    QMenu *formatMenu = menuBar->addMenu("Format");
+    QAction *wordWrapAction = formatMenu->addAction("Word Wrap");
+    wordWrapAction->setCheckable(true);
+    wordWrapAction->setChecked(wordWrapEnabled);
+
+    connect(wordWrapAction, &QAction::triggered, this, &notepad::toggleWordWrap);
+
     setMenuBar(menuBar);
 }
 
@@ -196,4 +203,13 @@ void notepad::timeAndDate()
 
     documentArea->insertPlainText(time.toString("h:mm AP M/d/yy"));
 
+}
+
+void notepad::toggleWordWrap()
+{
+    wordWrapEnabled = !wordWrapEnabled;
+
+    QAction *temp = qobject_cast<QAction*>(sender());
+    temp->setChecked(wordWrapEnabled);
+    documentArea->setWordWrapMode(wordWrapEnabled == true ? QTextOption::WordWrap : QTextOption::NoWrap);
 }

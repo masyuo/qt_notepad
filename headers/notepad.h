@@ -35,6 +35,7 @@ private slots:
     void paste();
     void deleteSelection();
     void timeAndDate();
+    void toggleWordWrap();
 private:
     void createMenuBar();
     void createShortcuts();
@@ -44,6 +45,7 @@ private:
     QTextEdit *documentArea;
 
     QString currentFile;
+    bool wordWrapEnabled = true;
 };
 
 #endif //NOTEPAD_H
