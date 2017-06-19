@@ -29,6 +29,12 @@ void notepad::createMenuBar()
     fileMenu->addSeparator();
     QAction *exitAction = fileMenu->addAction("Exit");
 
+    newAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_N));
+    openAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_O));
+    saveAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_S));
+    saveAsAction->setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_S));
+    exitAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Q));
+
     connect(newAction, &QAction::triggered, this, &notepad::newDocument);
     connect(openAction, &QAction::triggered, this, &notepad::openDocument);
     connect(saveAction, &QAction::triggered, this, &notepad::saveDocument);
@@ -37,7 +43,6 @@ void notepad::createMenuBar()
 
     QMenu *editMenu = menuBar->addMenu("Edit");
     QAction *undoAction = editMenu->addAction("Undo");
-    QAction *redoAction = editMenu->addAction("Redo");
     editMenu->addSeparator();
     QAction *cutAction = editMenu->addAction("Cut");
     QAction *copyAction = editMenu->addAction("Copy");
@@ -46,8 +51,14 @@ void notepad::createMenuBar()
     editMenu->addSeparator();
     QAction *timeAction = editMenu->addAction("Time and Date");
 
+    undoAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_Z));
+    cutAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_X));
+    copyAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_C));
+    pasteAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_V));
+    deleteAction->setShortcut(Qt::Key_Delete);
+    timeAction->setShortcut(Qt::Key_F5);
+
     connect(undoAction, &QAction::triggered, this, &notepad::undo);
-    connect(redoAction, &QAction::triggered, this, &notepad::redo);
     connect(cutAction, &QAction::triggered, this, &notepad::cut);
     connect(copyAction, &QAction::triggered, this, &notepad::copy);
     connect(pasteAction, &QAction::triggered, this, &notepad::paste);
@@ -106,8 +117,15 @@ void notepad::openDocument()
 
 void notepad::saveDocument()
 {
-    save();
-    setWindowModified(false);
+    if(currentFile.isEmpty())
+    {
+        saveDocumentAs();
+    }
+    else
+    {
+        save();
+        setWindowModified(false);
+    }
 }
 
 void notepad::saveDocumentAs()
@@ -150,11 +168,6 @@ void  notepad::undo()
     documentArea->undo();
 }
 
-void notepad::redo()
-{
-    documentArea->redo();
-}
-
 void notepad::cut()
 {
     documentArea->cut();
@@ -181,5 +194,6 @@ void notepad::timeAndDate()
 {
     QDateTime time = QDateTime::currentDateTime();
 
-    documentArea->append(time.toString("h:mm AP M/d/yy"));
+    documentArea->insertPlainText(time.toString("h:mm AP M/d/yy"));
+
 }

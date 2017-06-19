@@ -16,6 +16,7 @@
 #include <QClipboard>
 #include <QMimeData>
 #include <QDateTime>
+#include <QShortcut>
 
 class notepad : public QMainWindow
 {
@@ -29,7 +30,6 @@ private slots:
     void saveDocument();
     void saveDocumentAs();
     void undo();
-    void redo();
     void cut();
     void copy();
     void paste();
@@ -37,6 +37,7 @@ private slots:
     void timeAndDate();
 private:
     void createMenuBar();
+    void createShortcuts();
     void setCurrentFile(QString file);
     void save();
     QMenuBar *menuBar;
