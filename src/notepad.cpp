@@ -39,7 +39,7 @@ void notepad::createMenuBar()
     connect(openAction, &QAction::triggered, this, &notepad::openDocument);
     connect(saveAction, &QAction::triggered, this, &notepad::saveDocument);
     connect(saveAsAction, &QAction::triggered, this, &notepad::saveDocumentAs);
-    connect(exitAction, &QAction::triggered, this, &QCoreApplication::exit);
+    connect(exitAction, &QAction::triggered, this, &notepad::exitApplication);
 
     QMenu *editMenu = menuBar->addMenu("Edit");
     QAction *undoAction = editMenu->addAction("Undo");
@@ -69,8 +69,10 @@ void notepad::createMenuBar()
     QAction *wordWrapAction = formatMenu->addAction("Word Wrap");
     wordWrapAction->setCheckable(true);
     wordWrapAction->setChecked(wordWrapEnabled);
+    QAction *fontAction = formatMenu->addAction("Font");
 
     connect(wordWrapAction, &QAction::triggered, this, &notepad::toggleWordWrap);
+    connect(fontAction, &QAction::triggered, this, &notepad::setFont);
 
     setMenuBar(menuBar);
 }
@@ -90,20 +92,37 @@ void notepad::textChanged()
     setWindowModified(true);
 }
 
-void notepad::newDocument()
+void notepad::createNew()
 {
     documentArea->clear();
     setCurrentFile("");
 }
 
-void notepad::openDocument()
+void notepad::newDocument()
+{
+    if(!isWindowModified())
+    {
+        createNew();
+    }
+    else
+    {
+        switch(modifiedDialog())
+        {
+            case QMessageBox::Save: saveDocument();
+            case QMessageBox::Discard: createNew(); break;
+            case QMessageBox::Cancel: break;
+        }
+    }
+}
+
+void notepad::open()
 {
     QString fileName = QFileDialog::getOpenFileName(this, "Open document", "", "Text files (*.txt);;All files (*)");
 
-    if(!fileName.isEmpty())
+    if (!fileName.isEmpty())
     {
         QFile file(fileName);
-        if(!file.open(QIODevice::ReadOnly))
+        if (!file.open(QIODevice::ReadOnly))
         {
             QMessageBox::information(this, "Unable to open file.", file.errorString());
             return;
@@ -112,13 +131,30 @@ void notepad::openDocument()
         QTextStream in(&file);
         QString line;
 
-        while((line = in.readLine()) != NULL)
+        while ((line = in.readLine()) != NULL)
         {
             documentArea->append(line);
         }
 
         setCurrentFile(fileName);
         file.close();
+    }
+}
+
+void notepad::openDocument()
+{
+    if(!isWindowModified())
+    {
+        open();
+    }
+    else
+    {
+        switch(modifiedDialog())
+        {
+            case QMessageBox::Save: saveDocument();
+            case QMessageBox::Discard: open(); break;
+            case QMessageBox::Cancel: break;
+        }
     }
 }
 
@@ -170,6 +206,25 @@ void notepad::save()
     file.close();
 }
 
+void notepad::exitApplication()
+{
+    if(isWindowModified())
+    {
+        switch(modifiedDialog())
+        {
+            case QMessageBox::Save: saveDocument();
+            case QMessageBox::Discard: exit(0);
+            case QMessageBox::Cancel: break;
+        }
+    }
+}
+
+int notepad::modifiedDialog()
+{
+    return QMessageBox::warning(this, "qt_notepad", "This document has been modified.\n"
+            "Do you want to save the changes?", QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel, QMessageBox::Save);
+}
+
 void  notepad::undo()
 {
     documentArea->undo();
@@ -212,4 +267,12 @@ void notepad::toggleWordWrap()
     QAction *temp = qobject_cast<QAction*>(sender());
     temp->setChecked(wordWrapEnabled);
     documentArea->setWordWrapMode(wordWrapEnabled == true ? QTextOption::WordWrap : QTextOption::NoWrap);
+}
+
+void notepad::setFont()
+{
+    bool ok;
+    QFont font = QFontDialog::getFont(&ok, this);
+
+    documentArea->setFont(font);
 }

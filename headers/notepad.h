@@ -17,6 +17,7 @@
 #include <QMimeData>
 #include <QDateTime>
 #include <QShortcut>
+#include <QFontDialog>
 
 class notepad : public QMainWindow
 {
@@ -29,6 +30,7 @@ private slots:
     void openDocument();
     void saveDocument();
     void saveDocumentAs();
+    void exitApplication();
     void undo();
     void cut();
     void copy();
@@ -36,11 +38,15 @@ private slots:
     void deleteSelection();
     void timeAndDate();
     void toggleWordWrap();
+    void setFont();
 private:
     void createMenuBar();
     void createShortcuts();
     void setCurrentFile(QString file);
+    void createNew();
+    void open();
     void save();
+    int modifiedDialog();
     QMenuBar *menuBar;
     QTextEdit *documentArea;
 
