@@ -4,8 +4,7 @@
 #include <QtCore/QTextStream>
 #include "notepad.h"
 
-notepad::notepad()
-{
+notepad::notepad() {
     createMenuBar();
 
     documentArea = new QTextEdit;
@@ -17,8 +16,7 @@ notepad::notepad()
     resize(1280, 720);
 }
 
-void notepad::createMenuBar()
-{
+void notepad::createMenuBar() {
     menuBar = new QMenuBar();
 
     QMenu *fileMenu = menuBar->addMenu("File");
@@ -77,8 +75,7 @@ void notepad::createMenuBar()
     setMenuBar(menuBar);
 }
 
-void notepad::setCurrentFile(QString file)
-{
+void notepad::setCurrentFile(QString file) {
     QFileInfo info(file);
     currentFile = file;
 
@@ -87,19 +84,16 @@ void notepad::setCurrentFile(QString file)
     setWindowModified(false);
 }
 
-void notepad::textChanged()
-{
+void notepad::textChanged() {
     setWindowModified(true);
 }
 
-void notepad::createNew()
-{
+void notepad::createNew() {
     documentArea->clear();
     setCurrentFile("");
 }
 
-void notepad::newDocument()
-{
+void notepad::newDocument() {
     if(!isWindowModified())
     {
         createNew();
@@ -115,8 +109,7 @@ void notepad::newDocument()
     }
 }
 
-void notepad::open()
-{
+void notepad::open() {
     QString fileName = QFileDialog::getOpenFileName(this, "Open document", "", "Text files (*.txt);;All files (*)");
 
     if (!fileName.isEmpty())
@@ -141,8 +134,7 @@ void notepad::open()
     }
 }
 
-void notepad::openDocument()
-{
+void notepad::openDocument() {
     if(!isWindowModified())
     {
         open();
@@ -158,8 +150,7 @@ void notepad::openDocument()
     }
 }
 
-void notepad::saveDocument()
-{
+void notepad::saveDocument() {
     if(currentFile.isEmpty())
     {
         saveDocumentAs();
@@ -171,8 +162,7 @@ void notepad::saveDocument()
     }
 }
 
-void notepad::saveDocumentAs()
-{
+void notepad::saveDocumentAs() {
     QString fileName = QFileDialog::getSaveFileName(this, "Open document", "", "Text files (*.txt);;All files (*)");
 
     if(!fileName.isEmpty())
@@ -190,8 +180,7 @@ void notepad::saveDocumentAs()
     }
 }
 
-void notepad::save()
-{
+void notepad::save() {
     QFile file(currentFile);
 
     if(!file.open(QIODevice::WriteOnly))
@@ -206,8 +195,7 @@ void notepad::save()
     file.close();
 }
 
-void notepad::exitApplication()
-{
+void notepad::exitApplication() {
     if(isWindowModified())
     {
         switch(modifiedDialog())
@@ -217,51 +205,46 @@ void notepad::exitApplication()
             case QMessageBox::Cancel: break;
         }
     }
+    else {
+        exit(0);
+    }
 }
 
-int notepad::modifiedDialog()
-{
+int notepad::modifiedDialog() {
     return QMessageBox::warning(this, "qt_notepad", "This document has been modified.\n"
             "Do you want to save the changes?", QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel, QMessageBox::Save);
 }
 
-void  notepad::undo()
-{
+void  notepad::undo() {
     documentArea->undo();
 }
 
-void notepad::cut()
-{
+void notepad::cut() {
     documentArea->cut();
 }
 
-void notepad::copy()
-{
+void notepad::copy() {
     documentArea->copy();
 }
 
-void notepad::paste()
-{
+void notepad::paste() {
     const QClipboard *clipboard = QGuiApplication::clipboard();
     const QMimeData *mimeData = clipboard->mimeData();
     documentArea->insertPlainText(mimeData->text());
 }
 
-void notepad::deleteSelection()
-{
+void notepad::deleteSelection() {
     documentArea->textCursor().removeSelectedText();
 }
 
-void notepad::timeAndDate()
-{
+void notepad::timeAndDate() {
     QDateTime time = QDateTime::currentDateTime();
 
     documentArea->insertPlainText(time.toString("h:mm AP M/d/yy"));
 
 }
 
-void notepad::toggleWordWrap()
-{
+void notepad::toggleWordWrap() {
     wordWrapEnabled = !wordWrapEnabled;
 
     QAction *temp = qobject_cast<QAction*>(sender());
@@ -269,8 +252,7 @@ void notepad::toggleWordWrap()
     documentArea->setWordWrapMode(wordWrapEnabled == true ? QTextOption::WordWrap : QTextOption::NoWrap);
 }
 
-void notepad::setFont()
-{
+void notepad::setFont() {
     bool ok;
     QFont font = QFontDialog::getFont(&ok, this);
 
