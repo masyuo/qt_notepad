@@ -1,1 +1,1 @@
-qt_notepad
+Notepad clone made using the QT framework.
